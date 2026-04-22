@@ -1,6 +1,7 @@
 import { Cormorant_Garamond, DM_Sans } from 'next/font/google'
 import './globals.css'
 import Sidebar from '@/components/Sidebar'
+import ClientLayout from '@/components/ClientLayout'
 
 const cormorant = Cormorant_Garamond({
   subsets: ['latin'],
@@ -29,14 +30,9 @@ export default function RootLayout({ children }) {
         minHeight: '100vh',
       }}>
         <Sidebar />
-        <main style={{
-          marginLeft: '240px',
-          minHeight: '100vh',
-          padding: '40px 48px',
-          backgroundColor: '#F8F4EE',
-        }}>
+        <ClientLayout>
           {children}
-        </main>
+        </ClientLayout>
       </body>
     </html>
   )

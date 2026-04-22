@@ -640,7 +640,7 @@ export default function Dashboard() {
       {/* Pills */}
       <div style={{
         display: 'flex', gap: '6px', marginBottom: '12px',
-        ...(isMobile ? { overflowX: 'auto', flexWrap: 'nowrap', paddingBottom: '4px', scrollbarWidth: 'none' } : { flexWrap: 'wrap' }),
+        ...(isMobile ? { overflowX: 'auto', flexWrap: 'nowrap', paddingBottom: '4px', scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' } : { flexWrap: 'wrap' }),
       }}>
         {['All', ...PRODUCTS.map(p => p.name)].map(name => {
           const active = name === 'All' ? isAll : selectedProducts.has(name)
@@ -720,16 +720,18 @@ export default function Dashboard() {
                     if (col.key === 'actions') return (
                       <td key="actions" style={{ padding: '12px 0' }}>
                         <div style={{ display: 'flex', gap: '6px' }}>
-                          <button
-                            title="Reorder"
-                            onClick={openOrder}
-                            style={{
-                              width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                              backgroundColor: c.umber, color: '#fff',
-                              border: 'none', borderRadius: '4px', cursor: 'pointer',
-                              fontSize: '14px', lineHeight: 1,
-                            }}
-                          >↺</button>
+                          {!isMobile && (
+                            <button
+                              title="Reorder"
+                              onClick={openOrder}
+                              style={{
+                                width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                backgroundColor: c.umber, color: '#fff',
+                                border: 'none', borderRadius: '4px', cursor: 'pointer',
+                                fontSize: '14px', lineHeight: 1,
+                              }}
+                            >↺</button>
+                          )}
                           <button
                             title="Details"
                             onClick={() => setDetailProduct(p)}
