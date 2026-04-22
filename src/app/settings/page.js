@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { products, emailSettings, shopifySettings } from '@/data/mockData'
+import { emailSettings, shopifySettings } from '@/data/mockData'
 
 const c = {
   vanilla: '#F8F4EE',
@@ -11,51 +11,64 @@ const c = {
   black: '#252525',
 }
 
-function Card({ children, style }) {
-  return <div style={{ backgroundColor: '#fff', border: `1px solid ${c.softDune}`, borderRadius: '6px', padding: '24px', ...style }}>{children}</div>
+const btnPrimary = {
+  backgroundColor: c.umber,
+  color: c.vanilla,
+  fontFamily: 'var(--font-body)',
+  fontSize: '12px',
+  fontWeight: '500',
+  padding: '8px 16px',
+  borderRadius: '4px',
+  border: 'none',
+  cursor: 'pointer',
 }
 
-function SectionTitle({ children }) {
-  return <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '20px', fontWeight: '600', color: c.umber, marginBottom: '4px' }}>{children}</h2>
+const btnSecondary = {
+  backgroundColor: 'transparent',
+  color: c.umber,
+  fontFamily: 'var(--font-body)',
+  fontSize: '12px',
+  fontWeight: '500',
+  padding: '8px 16px',
+  borderRadius: '4px',
+  border: `1px solid ${c.taupe}`,
+  cursor: 'pointer',
 }
 
-function Toggle({ checked, onChange, label, description }) {
-  return (
-    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', padding: '14px 0', borderBottom: `1px solid ${c.softDune}` }}>
-      <div>
-        <div style={{ fontSize: '14px', fontWeight: '500', color: c.black, fontFamily: 'var(--font-body)' }}>{label}</div>
-        {description && <div style={{ fontSize: '12px', color: c.taupe, marginTop: '3px', fontFamily: 'var(--font-body)' }}>{description}</div>}
-      </div>
-      <button
-        onClick={() => onChange(!checked)}
-        style={{
-          width: '44px',
-          height: '24px',
-          borderRadius: '12px',
-          border: 'none',
-          backgroundColor: checked ? c.umber : c.softDune,
-          cursor: 'pointer',
-          position: 'relative',
-          transition: 'background-color 0.2s ease',
-          flexShrink: 0,
-          marginLeft: '24px',
-          marginTop: '2px',
-        }}
-        aria-label={label}
-      >
-        <span style={{
-          position: 'absolute',
-          top: '3px',
-          left: checked ? '23px' : '3px',
-          width: '18px',
-          height: '18px',
-          borderRadius: '50%',
-          backgroundColor: '#fff',
-          transition: 'left 0.2s ease',
-        }} />
-      </button>
-    </div>
-  )
+const btnDestructive = {
+  backgroundColor: 'transparent',
+  color: '#721c24',
+  fontFamily: 'var(--font-body)',
+  fontSize: '12px',
+  fontWeight: '500',
+  padding: '8px 16px',
+  borderRadius: '4px',
+  border: '1px solid #dc3545',
+  cursor: 'pointer',
+}
+
+const thStyle = {
+  textAlign: 'left',
+  padding: '12px 0',
+  paddingRight: '16px',
+  fontSize: '11px',
+  fontWeight: '600',
+  color: c.taupe,
+  textTransform: 'uppercase',
+  letterSpacing: '0.08em',
+  whiteSpace: 'nowrap',
+  fontFamily: 'var(--font-body)',
+  borderBottom: `1px solid ${c.softDune}`,
+}
+
+const tdStyle = {
+  padding: '12px 0',
+  paddingRight: '16px',
+  fontFamily: 'var(--font-body)',
+  fontSize: '13.5px',
+  fontWeight: '400',
+  color: c.black,
+  borderBottom: `1px solid ${c.softDune}`,
 }
 
 const inputStyle = {
@@ -70,138 +83,383 @@ const inputStyle = {
   outline: 'none',
 }
 
-const labelStyle = {
+const fieldLabel = {
   fontSize: '11px',
-  fontWeight: '500',
+  fontWeight: '600',
   color: c.taupe,
   textTransform: 'uppercase',
   letterSpacing: '0.08em',
   display: 'block',
   marginBottom: '6px',
+  fontFamily: 'var(--font-body)',
 }
 
+// All 5 products — defined locally since mockData only has 3
+const INITIAL_PRODUCTS = [
+  { id: 'AR-001', name: 'Sea Mist',    reorderThreshold: 200 },
+  { id: 'AR-002', name: 'Glow Oil',   reorderThreshold: 150 },
+  { id: 'AR-003', name: 'Body Lotion', reorderThreshold: 200 },
+  { id: 'AR-004', name: 'Hand Wash',  reorderThreshold: 180 },
+  { id: 'AR-005', name: 'Lip Balm',   reorderThreshold: 120 },
+]
+
+const emptyAddForm = { name: '', sku: '', threshold: '', shopifyId: '', confirmed: false }
+
+function SectionHeading({ children }) {
+  return (
+    <div style={{ fontFamily: 'var(--font-heading)', fontSize: '18px', fontWeight: '500', color: '#252525', marginBottom: '4px' }}>
+      {children}
+    </div>
+  )
+}
+
+function Toggle({ checked, onChange, label, description }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', padding: '14px 0', borderBottom: `1px solid ${c.softDune}` }}>
+      <div>
+        <div style={{ fontSize: '13.5px', fontWeight: '400', color: c.black, fontFamily: 'var(--font-body)' }}>{label}</div>
+        {description && <div style={{ fontSize: '11px', color: c.taupe, marginTop: '3px', fontFamily: 'var(--font-body)' }}>{description}</div>}
+      </div>
+      <button
+        onClick={() => onChange(!checked)}
+        style={{
+          width: '44px', height: '24px', borderRadius: '12px', border: 'none',
+          backgroundColor: checked ? c.umber : c.softDune,
+          cursor: 'pointer', position: 'relative',
+          transition: 'background-color 0.2s ease', flexShrink: 0, marginLeft: '24px', marginTop: '2px',
+        }}
+        aria-label={label}
+      >
+        <span style={{
+          position: 'absolute', top: '3px', left: checked ? '23px' : '3px',
+          width: '18px', height: '18px', borderRadius: '50%',
+          backgroundColor: '#fff', transition: 'left 0.2s ease',
+        }} />
+      </button>
+    </div>
+  )
+}
+
+// ─── Delete confirmation modal ─────────────────────────────────
+function DeleteModal({ product, confirmText, onTextChange, onConfirm, onCancel }) {
+  if (!product) return null
+  const canConfirm = confirmText === 'DELETE'
+  return (
+    <>
+      <div
+        onClick={onCancel}
+        style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(37,37,37,0.28)', zIndex: 200 }}
+      />
+      <div style={{
+        position: 'fixed',
+        top: '50%', left: '50%',
+        transform: 'translate(-50%, -50%)',
+        backgroundColor: '#fff',
+        border: `1px solid ${c.softDune}`,
+        borderRadius: '6px',
+        padding: '28px 24px 22px',
+        zIndex: 300,
+        width: '400px',
+        fontFamily: 'var(--font-body)',
+      }}>
+        {/* Header */}
+        <div style={{ fontFamily: 'var(--font-heading)', fontSize: '18px', fontWeight: '500', color: '#252525', marginBottom: '12px' }}>
+          Delete {product.name}?
+        </div>
+
+        {/* Warning */}
+        <div style={{
+          backgroundColor: '#f8d7da',
+          border: '1px solid #f5c6cb',
+          borderRadius: '4px',
+          padding: '12px 14px',
+          marginBottom: '20px',
+          fontSize: '13px',
+          color: '#721c24',
+          lineHeight: 1.6,
+        }}>
+          Before deleting this product, make sure it is no longer visible on your online store and all active batches are closed.
+        </div>
+
+        {/* Confirm input */}
+        <div style={{ marginBottom: '20px' }}>
+          <label style={fieldLabel}>Type DELETE to confirm</label>
+          <input
+            type="text"
+            value={confirmText}
+            onChange={e => onTextChange(e.target.value)}
+            placeholder="DELETE"
+            style={{ ...inputStyle, borderColor: confirmText && !canConfirm ? '#dc3545' : c.softDune }}
+            autoFocus
+          />
+        </div>
+
+        {/* Actions */}
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <button
+            onClick={onConfirm}
+            disabled={!canConfirm}
+            style={{
+              ...btnDestructive,
+              backgroundColor: canConfirm ? '#dc3545' : '#f8d7da',
+              color: canConfirm ? '#fff' : '#721c24',
+              borderColor: canConfirm ? '#dc3545' : '#f5c6cb',
+              cursor: canConfirm ? 'pointer' : 'not-allowed',
+              border: 'none',
+            }}
+          >
+            Confirm Delete
+          </button>
+          <button onClick={onCancel} style={btnSecondary}>Cancel</button>
+        </div>
+      </div>
+    </>
+  )
+}
+
+// ─── Add Product slide-in panel ────────────────────────────────
+function AddProductPanel({ show, form, onFormChange, onSave, onCancel }) {
+  const canSave = form.name.trim() && form.sku.trim() && form.threshold && form.confirmed
+  return (
+    <>
+      {show && (
+        <div
+          onClick={onCancel}
+          style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(37,37,37,0.18)', zIndex: 200 }}
+        />
+      )}
+      <div style={{
+        position: 'fixed', top: 0, right: 0, bottom: 0,
+        width: '400px',
+        backgroundColor: '#fff',
+        borderLeft: `1px solid ${c.softDune}`,
+        zIndex: 300,
+        display: 'flex',
+        flexDirection: 'column',
+        transform: show ? 'translateX(0)' : 'translateX(100%)',
+        transition: 'transform 0.26s cubic-bezier(0.4,0,0.2,1)',
+      }}>
+        {/* Panel header */}
+        <div style={{ padding: '28px 28px 20px', borderBottom: `1px solid ${c.softDune}`, flexShrink: 0 }}>
+          <div style={{ fontFamily: 'var(--font-heading)', fontSize: '20px', fontWeight: '500', color: '#252525' }}>
+            Add Product
+          </div>
+        </div>
+
+        {/* Panel fields */}
+        <div style={{ flex: 1, overflowY: 'auto', padding: '24px 28px' }}>
+          <div style={{ marginBottom: '18px' }}>
+            <label style={fieldLabel}>Product Name *</label>
+            <input
+              type="text"
+              required
+              style={inputStyle}
+              placeholder="e.g. Face Serum"
+              value={form.name}
+              onChange={e => onFormChange('name', e.target.value)}
+            />
+          </div>
+
+          <div style={{ marginBottom: '18px' }}>
+            <label style={fieldLabel}>SKU *</label>
+            <input
+              type="text"
+              required
+              style={inputStyle}
+              placeholder="e.g. AR-006"
+              value={form.sku}
+              onChange={e => onFormChange('sku', e.target.value)}
+            />
+          </div>
+
+          <div style={{ marginBottom: '18px' }}>
+            <label style={fieldLabel}>Reorder Threshold *</label>
+            <input
+              type="number"
+              required
+              min="1"
+              style={inputStyle}
+              placeholder="e.g. 150"
+              value={form.threshold}
+              onChange={e => onFormChange('threshold', e.target.value)}
+            />
+          </div>
+
+          <div style={{ marginBottom: '24px' }}>
+            <label style={fieldLabel}>Shopify Product ID</label>
+            <input
+              type="text"
+              style={inputStyle}
+              placeholder="Add when Shopify is connected"
+              value={form.shopifyId}
+              onChange={e => onFormChange('shopifyId', e.target.value)}
+            />
+          </div>
+
+          {/* Confirmation checkbox */}
+          <label style={{
+            display: 'flex',
+            alignItems: 'flex-start',
+            gap: '10px',
+            cursor: 'pointer',
+            marginBottom: '8px',
+          }}>
+            <input
+              type="checkbox"
+              checked={form.confirmed}
+              onChange={e => onFormChange('confirmed', e.target.checked)}
+              style={{ marginTop: '2px', width: '15px', height: '15px', flexShrink: 0, cursor: 'pointer', accentColor: c.umber }}
+            />
+            <span style={{ fontFamily: 'var(--font-body)', fontSize: '13px', color: c.black, lineHeight: 1.5 }}>
+              I confirm this product is set up and ready to fulfil orders
+            </span>
+          </label>
+        </div>
+
+        {/* Panel footer */}
+        <div style={{ padding: '20px 28px', borderTop: `1px solid ${c.softDune}`, display: 'flex', gap: '10px', flexShrink: 0 }}>
+          <button
+            onClick={onSave}
+            disabled={!canSave}
+            style={{
+              ...btnPrimary,
+              opacity: canSave ? 1 : 0.45,
+              cursor: canSave ? 'pointer' : 'not-allowed',
+            }}
+          >
+            Save Product
+          </button>
+          <button onClick={onCancel} style={btnSecondary}>Cancel</button>
+        </div>
+      </div>
+    </>
+  )
+}
+
+// ─── Page ──────────────────────────────────────────────────────
 export default function SettingsPage() {
-  const [productList, setProductList] = useState(products.map(p => ({ ...p })))
-  const [email, setEmail] = useState(emailSettings)
-  const [shopify, setShopify] = useState(shopifySettings)
+  const [productList, setProductList] = useState(INITIAL_PRODUCTS)
+  const [email, setEmail]             = useState(emailSettings)
+  const [shopify, setShopify]         = useState(shopifySettings)
   const [savedSection, setSavedSection] = useState(null)
-  const [editingProduct, setEditingProduct] = useState(null)
+
+  // Delete modal state
+  const [deleteModal, setDeleteModal]         = useState(null)
+  const [deleteConfirmText, setDeleteConfirmText] = useState('')
+
+  // Add panel state
+  const [showAddPanel, setShowAddPanel] = useState(false)
+  const [addForm, setAddForm]           = useState(emptyAddForm)
 
   const save = (section) => {
     setSavedSection(section)
     setTimeout(() => setSavedSection(null), 2500)
   }
 
-  const updateProductThreshold = (id, value) => {
-    setProductList(prev => prev.map(p => p.id === id ? { ...p, reorderThreshold: Number(value) } : p))
+  function openDelete(product) {
+    setDeleteModal(product)
+    setDeleteConfirmText('')
   }
 
-  const updateProductPrice = (id, value) => {
-    setProductList(prev => prev.map(p => p.id === id ? { ...p, sellingPrice: Number(value) } : p))
+  function handleConfirmDelete() {
+    setProductList(prev => prev.filter(p => p.id !== deleteModal.id))
+    setDeleteModal(null)
+    setDeleteConfirmText('')
+  }
+
+  function handleAddFormChange(field, value) {
+    setAddForm(prev => ({ ...prev, [field]: value }))
+  }
+
+  function handleSaveProduct() {
+    const newProduct = {
+      id: addForm.sku.trim().toUpperCase(),
+      name: addForm.name.trim(),
+      reorderThreshold: Number(addForm.threshold),
+    }
+    setProductList(prev => [...prev, newProduct])
+    setShowAddPanel(false)
+    setAddForm(emptyAddForm)
+  }
+
+  function handleCancelAdd() {
+    setShowAddPanel(false)
+    setAddForm(emptyAddForm)
   }
 
   return (
     <div>
-      <div style={{ marginBottom: '36px' }}>
-        <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: '32px', fontWeight: '600', color: c.umber }}>Settings</h1>
-        <p style={{ marginTop: '6px', fontSize: '14px', color: c.taupe }}>Manage products, alert preferences, and integrations</p>
-      </div>
+      {/* Page title */}
+      <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: '28px', fontWeight: '500', color: '#252525', marginBottom: '32px' }}>
+        Settings
+      </h1>
 
-      {/* Products */}
-      <Card style={{ marginBottom: '24px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '6px' }}>
+      {/* ── Products ───────────────────────────────────────────── */}
+      <div style={{ marginBottom: '32px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '16px' }}>
           <div>
-            <SectionTitle>Products</SectionTitle>
-            <p style={{ fontSize: '13px', color: c.taupe, fontFamily: 'var(--font-body)', marginBottom: '20px' }}>Configure reorder thresholds and selling prices per SKU</p>
-          </div>
-          {savedSection === 'products' && (
-            <div style={{ fontSize: '13px', color: '#2d6a4f', fontWeight: '500', fontFamily: 'var(--font-body)', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              ✓ Saved
+            <SectionHeading>Products</SectionHeading>
+            <div style={{ fontSize: '11px', color: c.taupe, fontFamily: 'var(--font-body)', marginTop: '4px' }}>
+              Manage your product catalogue and reorder thresholds
             </div>
-          )}
+          </div>
+          <button onClick={() => setShowAddPanel(true)} style={btnPrimary}>
+            + Add Product
+          </button>
         </div>
 
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: 'var(--font-body)', fontSize: '13px', marginBottom: '20px' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: 'var(--font-body)' }}>
           <thead>
-            <tr style={{ backgroundColor: c.softDune }}>
-              {['SKU', 'Product Name', 'Category', 'Reorder Threshold (units)', 'Selling Price (USD)', 'Actions'].map(h => (
-                <th key={h} style={{ textAlign: 'left', padding: '10px 16px', color: c.umber, fontWeight: '600', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.06em', whiteSpace: 'nowrap' }}>{h}</th>
-              ))}
+            <tr>
+              <th style={thStyle}>SKU</th>
+              <th style={thStyle}>Name</th>
+              <th style={thStyle}>Reorder Threshold</th>
+              <th style={{ ...thStyle, paddingRight: '0' }}>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {productList.map((p, i) => (
-              <tr key={p.id} style={{ backgroundColor: i % 2 === 0 ? '#fff' : c.vanilla, borderBottom: `1px solid ${c.softDune}` }}>
-                <td style={{ padding: '12px 16px', fontWeight: '600', color: c.umber, fontFamily: 'monospace', fontSize: '12px' }}>{p.id}</td>
-                <td style={{ padding: '12px 16px', color: c.black, fontWeight: '500' }}>{p.name}</td>
-                <td style={{ padding: '12px 16px', color: c.taupe }}>{p.category}</td>
-                <td style={{ padding: '12px 16px' }}>
-                  {editingProduct === p.id ? (
-                    <input
-                      type="number"
-                      min="1"
-                      value={p.reorderThreshold}
-                      onChange={e => updateProductThreshold(p.id, e.target.value)}
-                      style={{ ...inputStyle, width: '100px' }}
-                      autoFocus
-                    />
-                  ) : (
-                    <span style={{ fontWeight: '500', color: c.black }}>{p.reorderThreshold.toLocaleString()}</span>
-                  )}
+            {productList.map(p => (
+              <tr key={p.id} style={{ backgroundColor: 'transparent' }}>
+                <td style={{ ...tdStyle, fontWeight: '600', color: c.umber, fontFamily: 'monospace', fontSize: '12px' }}>
+                  {p.id}
                 </td>
-                <td style={{ padding: '12px 16px' }}>
-                  {editingProduct === p.id ? (
-                    <input
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      value={p.sellingPrice}
-                      onChange={e => updateProductPrice(p.id, e.target.value)}
-                      style={{ ...inputStyle, width: '100px' }}
-                    />
-                  ) : (
-                    <span style={{ fontWeight: '500', color: c.black }}>${p.sellingPrice.toFixed(2)}</span>
-                  )}
+                <td style={tdStyle}>{p.name}</td>
+                <td style={{ ...tdStyle, fontWeight: '600', color: '#252525' }}>
+                  {p.reorderThreshold.toLocaleString()} units
                 </td>
-                <td style={{ padding: '12px 16px' }}>
-                  {editingProduct === p.id ? (
-                    <button
-                      onClick={() => { setEditingProduct(null); save('products') }}
-                      style={{ padding: '5px 12px', backgroundColor: c.umber, color: c.vanilla, border: 'none', borderRadius: '4px', fontSize: '12px', cursor: 'pointer', fontFamily: 'var(--font-body)' }}
-                    >
-                      Save
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => setEditingProduct(p.id)}
-                      style={{ padding: '5px 12px', backgroundColor: 'transparent', color: c.umber, border: `1px solid ${c.taupe}`, borderRadius: '4px', fontSize: '12px', cursor: 'pointer', fontFamily: 'var(--font-body)' }}
-                    >
-                      Edit
-                    </button>
-                  )}
+                <td style={{ ...tdStyle, paddingRight: '0' }}>
+                  <button onClick={() => openDelete(p)} style={btnDestructive}>
+                    Delete
+                  </button>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
-      </Card>
 
-      {/* Email Alerts */}
-      <Card style={{ marginBottom: '24px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        {productList.length === 0 && (
+          <div style={{ padding: '24px 0', textAlign: 'center', color: c.taupe, fontFamily: 'var(--font-body)', fontSize: '13.5px' }}>
+            No products. Add one to get started.
+          </div>
+        )}
+      </div>
+
+      {/* ── Email Alerts ────────────────────────────────────────── */}
+      <div style={{ border: `1px solid ${c.softDune}`, borderRadius: '4px', padding: '24px', marginBottom: '32px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '6px' }}>
           <div>
-            <SectionTitle>Email Alert Preferences</SectionTitle>
-            <p style={{ fontSize: '13px', color: c.taupe, fontFamily: 'var(--font-body)', marginBottom: '20px' }}>Configure when and where automated alerts are sent</p>
+            <SectionHeading>Email Alert Preferences</SectionHeading>
+            <div style={{ fontSize: '11px', color: c.taupe, fontFamily: 'var(--font-body)', marginBottom: '20px' }}>
+              Configure when and where automated alerts are sent
+            </div>
           </div>
           {savedSection === 'email' && (
-            <div style={{ fontSize: '13px', color: '#2d6a4f', fontWeight: '500', fontFamily: 'var(--font-body)', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              ✓ Saved
-            </div>
+            <div style={{ fontSize: '13px', color: '#155724', fontWeight: '500', fontFamily: 'var(--font-body)' }}>✓ Saved</div>
           )}
         </div>
 
         <div style={{ marginBottom: '20px' }}>
-          <label style={labelStyle}>Alert Email Address</label>
+          <label style={fieldLabel}>Alert Email Address</label>
           <input
             type="email"
             value={email.alertEmail}
@@ -211,40 +469,16 @@ export default function SettingsPage() {
         </div>
 
         <div>
-          <Toggle
-            checked={email.lowStockAlerts}
-            onChange={v => setEmail({ ...email, lowStockAlerts: v })}
-            label="Low Stock Alerts"
-            description="Send an alert when any product falls below its reorder threshold"
-          />
-          <Toggle
-            checked={email.paymentDueAlerts}
-            onChange={v => setEmail({ ...email, paymentDueAlerts: v })}
-            label="Payment Due Alerts"
-            description="Remind when a supplier deposit or final payment is outstanding"
-          />
-          <Toggle
-            checked={email.batchReceivedAlerts}
-            onChange={v => setEmail({ ...email, batchReceivedAlerts: v })}
-            label="Batch Received Confirmations"
-            description="Send a confirmation email when stock is marked as received"
-          />
-          <Toggle
-            checked={email.weeklyDigest}
-            onChange={v => setEmail({ ...email, weeklyDigest: v })}
-            label="Weekly Digest"
-            description="A summary of stock levels, costs, and outstanding payments each week"
-          />
+          <Toggle checked={email.lowStockAlerts} onChange={v => setEmail({ ...email, lowStockAlerts: v })} label="Low Stock Alerts" description="Send an alert when any product falls below its reorder threshold" />
+          <Toggle checked={email.paymentDueAlerts} onChange={v => setEmail({ ...email, paymentDueAlerts: v })} label="Payment Due Alerts" description="Remind when a supplier deposit or final payment is outstanding" />
+          <Toggle checked={email.batchReceivedAlerts} onChange={v => setEmail({ ...email, batchReceivedAlerts: v })} label="Batch Received Confirmations" description="Send a confirmation email when stock is marked as received" />
+          <Toggle checked={email.weeklyDigest} onChange={v => setEmail({ ...email, weeklyDigest: v })} label="Weekly Digest" description="A summary of stock levels, costs, and outstanding payments each week" />
         </div>
 
         {email.weeklyDigest && (
           <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: `1px solid ${c.softDune}` }}>
-            <label style={labelStyle}>Digest Day</label>
-            <select
-              value={email.digestDay}
-              onChange={e => setEmail({ ...email, digestDay: e.target.value })}
-              style={{ ...inputStyle, maxWidth: '200px' }}
-            >
+            <label style={fieldLabel}>Digest Day</label>
+            <select value={email.digestDay} onChange={e => setEmail({ ...email, digestDay: e.target.value })} style={{ ...inputStyle, maxWidth: '200px' }}>
               {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map(d => (
                 <option key={d} value={d}>{d}</option>
               ))}
@@ -253,40 +487,32 @@ export default function SettingsPage() {
         )}
 
         <div style={{ marginTop: '20px' }}>
-          <button onClick={() => save('email')} style={{ padding: '10px 24px', backgroundColor: c.umber, color: c.vanilla, border: 'none', borderRadius: '4px', fontSize: '13px', fontWeight: '500', cursor: 'pointer', fontFamily: 'var(--font-body)' }}>
-            Save Email Settings
-          </button>
+          <button onClick={() => save('email')} style={btnPrimary}>Save Email Settings</button>
         </div>
-      </Card>
+      </div>
 
-      {/* Shopify Integration */}
-      <Card>
-        <SectionTitle>Shopify Integration</SectionTitle>
-        <p style={{ fontSize: '13px', color: c.taupe, fontFamily: 'var(--font-body)', marginBottom: '24px' }}>
-          Connect your Shopify store to sync inventory levels and product data. This integration slot is ready to configure.
-        </p>
+      {/* ── Shopify Integration ─────────────────────────────────── */}
+      <div style={{ border: `1px solid ${c.softDune}`, borderRadius: '4px', padding: '24px' }}>
+        <SectionHeading>Shopify Integration</SectionHeading>
+        <div style={{ fontSize: '11px', color: c.taupe, fontFamily: 'var(--font-body)', marginBottom: '24px' }}>
+          Connect your Shopify store to sync inventory levels and product data
+        </div>
 
-        <div style={{ backgroundColor: c.vanilla, border: `1px solid ${c.softDune}`, borderRadius: '6px', padding: '20px', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div style={{ width: '40px', height: '40px', backgroundColor: c.softDune, borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px' }}>
-            🛍
-          </div>
+        <div style={{ backgroundColor: c.vanilla, border: `1px solid ${c.softDune}`, borderRadius: '4px', padding: '16px', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <div style={{ width: '36px', height: '36px', backgroundColor: c.softDune, borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px' }}>🛍</div>
           <div>
-            <div style={{ fontWeight: '600', color: c.black, fontFamily: 'var(--font-body)', fontSize: '14px' }}>Shopify Store</div>
-            <div style={{ fontSize: '12px', color: c.taupe, fontFamily: 'var(--font-body)', marginTop: '2px' }}>
+            <div style={{ fontWeight: '600', color: c.black, fontFamily: 'var(--font-body)', fontSize: '13.5px' }}>Shopify Store</div>
+            <div style={{ fontSize: '11px', color: c.taupe, fontFamily: 'var(--font-body)', marginTop: '2px' }}>
               {shopify.connected ? `Connected to ${shopify.storeUrl}` : 'Not connected — enter your API credentials below'}
             </div>
           </div>
           <div style={{ marginLeft: 'auto' }}>
             <span style={{
-              display: 'inline-block',
-              padding: '4px 12px',
-              borderRadius: '3px',
-              fontSize: '11px',
-              fontWeight: '600',
-              letterSpacing: '0.06em',
-              textTransform: 'uppercase',
-              backgroundColor: shopify.connected ? '#eaf4ee' : c.softDune,
-              color: shopify.connected ? '#2d6a4f' : c.taupe,
+              display: 'inline-block', padding: '2px 8px', borderRadius: '3px',
+              fontSize: '10px', fontWeight: '700', letterSpacing: '0.06em', textTransform: 'uppercase',
+              fontFamily: 'var(--font-body)',
+              backgroundColor: shopify.connected ? '#d4edda' : c.softDune,
+              color: shopify.connected ? '#155724' : c.taupe,
             }}>
               {shopify.connected ? 'Connected' : 'Not Connected'}
             </span>
@@ -295,51 +521,54 @@ export default function SettingsPage() {
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '20px' }}>
           <div>
-            <label style={labelStyle}>Store URL</label>
-            <input
-              type="text"
-              placeholder="yourstore.myshopify.com"
-              value={shopify.storeUrl}
-              onChange={e => setShopify({ ...shopify, storeUrl: e.target.value })}
-              style={inputStyle}
-            />
+            <label style={fieldLabel}>Store URL</label>
+            <input type="text" placeholder="yourstore.myshopify.com" value={shopify.storeUrl} onChange={e => setShopify({ ...shopify, storeUrl: e.target.value })} style={inputStyle} />
           </div>
           <div>
-            <label style={labelStyle}>Admin API Access Token</label>
-            <input
-              type="password"
-              placeholder="shpat_xxxxxxxxxxxxxxxx"
-              value={shopify.apiKey}
-              onChange={e => setShopify({ ...shopify, apiKey: e.target.value })}
-              style={inputStyle}
-            />
+            <label style={fieldLabel}>Admin API Access Token</label>
+            <input type="password" placeholder="shpat_xxxxxxxxxxxxxxxx" value={shopify.apiKey} onChange={e => setShopify({ ...shopify, apiKey: e.target.value })} style={inputStyle} />
           </div>
         </div>
 
         <div style={{ backgroundColor: c.softDune, borderRadius: '4px', padding: '12px 16px', marginBottom: '20px', fontSize: '12px', color: c.umber, fontFamily: 'var(--font-body)' }}>
-          <strong>When connected:</strong> ARDA Supply will sync inventory counts to Shopify product variants, and pull order data to automatically deduct stock. The Shopify Admin API requires the <code style={{ fontFamily: 'monospace', backgroundColor: c.vanilla, padding: '1px 4px', borderRadius: '2px' }}>read_inventory</code> and <code style={{ fontFamily: 'monospace', backgroundColor: c.vanilla, padding: '1px 4px', borderRadius: '2px' }}>write_inventory</code> scopes.
+          <strong>When connected:</strong> ARDA Supply will sync inventory counts to Shopify product variants, and pull order data to automatically deduct stock. The Shopify Admin API requires the{' '}
+          <code style={{ fontFamily: 'monospace', backgroundColor: c.vanilla, padding: '1px 4px', borderRadius: '2px' }}>read_inventory</code> and{' '}
+          <code style={{ fontFamily: 'monospace', backgroundColor: c.vanilla, padding: '1px 4px', borderRadius: '2px' }}>write_inventory</code> scopes.
         </div>
 
         <div style={{ display: 'flex', gap: '12px' }}>
-          <button
-            onClick={() => save('shopify')}
-            style={{ padding: '10px 24px', backgroundColor: c.umber, color: c.vanilla, border: 'none', borderRadius: '4px', fontSize: '13px', fontWeight: '500', cursor: 'pointer', fontFamily: 'var(--font-body)' }}
-          >
+          <button onClick={() => save('shopify')} style={btnPrimary}>
             {shopify.connected ? 'Update Connection' : 'Connect Shopify'}
           </button>
           {shopify.connected && (
-            <button style={{ padding: '10px 20px', backgroundColor: 'transparent', color: '#721c24', border: '1px solid #dc3545', borderRadius: '4px', fontSize: '13px', cursor: 'pointer', fontFamily: 'var(--font-body)' }}>
-              Disconnect
-            </button>
+            <button style={{ ...btnSecondary, color: '#721c24', border: '1px solid #dc3545' }}>Disconnect</button>
           )}
         </div>
 
         {savedSection === 'shopify' && (
-          <div style={{ marginTop: '16px', fontSize: '13px', color: '#2d6a4f', fontWeight: '500', fontFamily: 'var(--font-body)' }}>
+          <div style={{ marginTop: '16px', fontSize: '13px', color: '#155724', fontWeight: '500', fontFamily: 'var(--font-body)' }}>
             ✓ Settings saved. (Mock — no connection established)
           </div>
         )}
-      </Card>
+      </div>
+
+      {/* ── Delete confirmation modal ──────────────────────────── */}
+      <DeleteModal
+        product={deleteModal}
+        confirmText={deleteConfirmText}
+        onTextChange={setDeleteConfirmText}
+        onConfirm={handleConfirmDelete}
+        onCancel={() => { setDeleteModal(null); setDeleteConfirmText('') }}
+      />
+
+      {/* ── Add Product slide-in panel ─────────────────────────── */}
+      <AddProductPanel
+        show={showAddPanel}
+        form={addForm}
+        onFormChange={handleAddFormChange}
+        onSave={handleSaveProduct}
+        onCancel={handleCancelAdd}
+      />
     </div>
   )
 }
